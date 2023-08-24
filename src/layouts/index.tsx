@@ -1,21 +1,28 @@
-import { Link, Outlet } from 'umi';
-import styles from './index.less';
+import React from 'react';
+import { useEventEmitter } from 'ahooks';
 
-export default function Layout() {
+function MyComponent() {
+  const emitter = useEventEmitter();
+
+  const handleClick = () => {
+    // 触发自定义事件
+    emitter.emit('myEvent', 'Hello, World!');
+  };
+
+  // 订阅自定义事件
+  React.useEffect(() => {
+    const handleEvent = (data) => {
+      console.log('Event received:', data);
+    };
+    emitter.on('myEvent', handleEvent);
+
+    return () => {
+      // 在组件卸载时取消订阅
+      emitter.off('myEvent', handleEvent);
+    };
+  }, [emitter]);
+
   return (
-    <div className={styles.navs}>
-      <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/docs">Docs</Link>
-        </li>
-        <li>
-          <a href="https://github.com/umijs/umi">Github</a>
-        </li>
-      </ul>
-      <Outlet />
-    </div>
+    <button onClick={handleClick}>Click Me</button>
   );
 }
